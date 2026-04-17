@@ -16,7 +16,7 @@ static bool Condition(STATE *const State, uint8_t SK)
                         return true;
                 break;
         case 03:
-                if ((int16_t)State->AC < 0)
+                if ((int32_t)State->AC < 0)
                         return true;
                 break;
         }
