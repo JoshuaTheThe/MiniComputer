@@ -42,6 +42,15 @@ static bool Condition(STATE *const State, uint8_t SK)
         return false;
 }
 
+static uint32_t Extend(uint32_t value)
+{
+        uint8_t byte = value & 0xFF;
+        if (byte & 0x80)
+                return byte | 0x3FE00;
+        else
+                return byte;
+}
+
 void AdvanceState(STATE *const State)
 {
         State->IR = (uint64_t)State->M[State->PC] | (((uint64_t)State->M[State->PC + 1]) << 18);
@@ -100,7 +109,7 @@ void AdvanceState(STATE *const State)
                 State->AC = State->EA;
                 break;
         case 016:
-                State->AC = State->IX;
+                State->AC = Extend(State->AC);
                 break;
         case 017:
                 State->IX = State->AC;

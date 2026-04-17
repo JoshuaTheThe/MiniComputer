@@ -23,7 +23,7 @@
 |`1011`|`LDX`|`IX <- M[Address]`|
 |`1100`|`STX`|`M[Address] <- IX`|
 |`1101`|`LEA`|`A <- Address`|
-|`1110`|`TAX`|`A <- IX`|
+|`1110`|`EXT`|`A <- SignExtend8To18(A)`|
 |`1111`|`TXA`|`IX <- A`|
 
 - `Address = ImmediateAddress + (IX & Instruction[04])`
