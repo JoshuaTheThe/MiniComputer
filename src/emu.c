@@ -30,8 +30,8 @@ void AdvanceState(STATE *const State)
         const uint8_t  OP = IR & 017;
         const uint8_t  BI = (IR >> 4) & 01;
         const uint8_t  SK = (IR >> 5) & 03;
-        const uint16_t IM = (IR >> 7) & ((1 << 18) - 1);
-        const uint16_t EA = (IM) + (State->IX & BI);
+        const uint32_t IM = (IR >> 7) & ((1 << 18) - 1);
+        const uint32_t EA = ((IM) + (State->IX & BI)) & 0x3FFFF;
         State->PC+=2;
         if (!Condition(State, SK))
                 return;
@@ -41,7 +41,7 @@ void AdvanceState(STATE *const State)
         case 001:       State->M[EA].X = State->AC;           break;
         case 002:       State->PC = EA;                       break;
         case 003:       State->IX = State->PC,State->PC = EA; break;
-        case 004:       State->AC = State->AC;                break;
+        case 004:       State->Halted = true;                 break;
         case 005:       State->IX -= EA;                      break;
         case 006:       State->AC = (State->AC & ((1 << 18) - 1)) +
                           State->M[EA].X + (State->AC >> 18); break;

@@ -14,6 +14,7 @@ typedef struct
 {
         uint32_t        AC : 19, IX : 18, PC : 18;
         WORD            M[1 << 18];
+        bool            Halted;
 } STATE;
 
 void AdvanceState(STATE *const State);

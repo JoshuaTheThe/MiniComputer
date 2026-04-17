@@ -13,7 +13,7 @@
 |`0001`|`STA`|`M[Address] <- A`|
 |`0010`|`JMP`,`RTS`|`PC <- Address`|
 |`0011`|`JSR`|`IX <- PC; PC <- Address`|
-|`0100`|`RES`|`A <- A` Reserved|
+|`0100`|`HLT`|`Halt`|
 |`0101`|`SIX`|`IX <- IX - Address`|
 |`0110`|`ADC`|`A <- A + M[Address] + A[18]`|
 |`0111`|`SBB`|`A <- A - M[Address] - A[18]`|
