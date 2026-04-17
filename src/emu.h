@@ -5,10 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct
-{
-        uint32_t        X : 18;
-} WORD;
+typedef uint32_t WORD;
 
 typedef struct
 {
@@ -18,5 +15,6 @@ typedef struct
 } STATE;
 
 void AdvanceState(STATE *const State);
+int ReadBinaryProgram(STATE *const State, const char *filename);
 
 #endif

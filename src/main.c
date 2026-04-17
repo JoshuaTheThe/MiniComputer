@@ -1,5 +1,7 @@
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <emu.h>
 
 #ifdef _WIN32
@@ -50,30 +52,44 @@ int getch(void)
 
 #endif
 
-#define IO_PUTC 0xFFFF0
-#define IO_GETC 0xFFFF1
+#define IO_PUTC 0x3FFF0
+#define IO_GETC 0x3FFF1
 
-int main(void)
+extern int asmmain(int argc, char **argv);
+
+int main(int argc, char **argv)
 {
-        init_terminal();
-        STATE State = {0};
-        State.M[0].X = 004;
-        while (!State.Halted)
+        if (argc < 2)
+                return -1;
+        if (!strncmp(argv[1],"/A",2))
         {
-                AdvanceState(&State);
-                if (State.M[IO_PUTC].X)
-                {
-                        putchar(State.M[IO_PUTC].X & 0xFF);
-                }
-
-                if (kbhit())
-                {
-                        State.M[IO_GETC].X = getch();
-                }
+                return asmmain(argc, argv);
         }
+        else if (!strncmp(argv[1],"/R",2) && argc == 3)
+        {
+                init_terminal();
+                STATE *State = calloc(1, sizeof(STATE));
+                ReadBinaryProgram(State, argv[2]);
+                while (!State->Halted)
+                {
+                        AdvanceState(State);
+                        if (State->M[IO_PUTC])
+                        {
+                                putchar(State->M[IO_PUTC] & 0xFF);
+                        }
 
-        printf("AC = %.8o\n", State.AC);
-        printf("IX = %.8o\n", State.IX);
-        printf("PC = %.8o\n", State.PC);
-        restore_terminal();
+                        if (kbhit())
+                        {
+                                State->M[IO_GETC] = getch();
+                        }
+
+                        State->Halted = true;
+                }
+
+                printf("AC = %.8o\n", State->AC);
+                printf("IX = %.8o\n", State->IX);
+                printf("PC = %.8o\n", State->PC);
+                restore_terminal();
+                free(State);
+        }
 }

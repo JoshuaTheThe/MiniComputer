@@ -1,5 +1,23 @@
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <emu.h>
+#include <string.h>
+
+int ReadBinaryProgram(STATE *const State, const char *filename)
+{
+        FILE *fp = fopen(filename, "rb");
+        if (!fp)
+        {
+                perror("Failed to open binary file");
+                return -1;
+        }
+
+        memset(State->M, 0, sizeof(WORD) * (1 << 18));
+        size_t words_read = fread(State->M, sizeof(WORD), 1 << 18, fp);
+        fclose(fp);
+        return 0;
+}
 
 static bool Condition(STATE *const State, uint8_t SK)
 {
@@ -26,34 +44,66 @@ static bool Condition(STATE *const State, uint8_t SK)
 
 void AdvanceState(STATE *const State)
 {
-        const uint64_t IR = (uint64_t)State->M[State->PC].X | (((uint64_t)State->M[State->PC+1].X) << 18);
-        const uint8_t  OP = IR & 017;
-        const uint8_t  BI = (IR >> 4) & 01;
-        const uint8_t  SK = (IR >> 5) & 03;
+        const uint64_t IR = (uint64_t)State->M[State->PC] | (((uint64_t)State->M[State->PC + 1]) << 18);
+        const uint8_t OP = IR & 017;
+        const uint8_t BI = (IR >> 4) & 01;
+        const uint8_t SK = (IR >> 5) & 03;
         const uint32_t IM = (IR >> 7) & ((1 << 18) - 1);
         const uint32_t EA = ((IM) + (State->IX & BI)) & 0x3FFFF;
-        State->PC+=2;
+        State->PC += 2;
         if (!Condition(State, SK))
                 return;
-        switch(OP)
+        switch (OP)
         {
-        case 000:       State->AC = State->M[EA].X;           break;
-        case 001:       State->M[EA].X = State->AC;           break;
-        case 002:       State->PC = EA;                       break;
-        case 003:       State->IX = State->PC,State->PC = EA; break;
-        case 004:       State->Halted = true;                 break;
-        case 005:       State->IX -= EA;                      break;
-        case 006:       State->AC = (State->AC & ((1 << 18) - 1)) +
-                          State->M[EA].X + (State->AC >> 18); break;
-        case 007:       State->AC = (State->AC & ((1 << 18) - 1)) -
-                          State->M[EA].X - (State->AC >> 18); break;
-        case 010:       State->AC = (State->AC & ((1 << 18) - 1)) & State->M[EA].X; break;
-        case 011:       State->AC = (State->AC & ((1 << 18) - 1)) | State->M[EA].X; break;
-        case 012:       State->AC = (State->AC & ((1 << 18) - 1)) ^ State->M[EA].X; break;
-        case 013:       State->IX = State->M[EA].X; break;
-        case 014:       State->M[EA].X = State->IX; break;
-        case 015:       State->AC = EA; break;
-        case 016:       State->AC = State->IX; break;
-        case 017:       State->IX = State->AC; break;
+        case 000:
+                State->AC = State->M[EA];
+                break;
+        case 001:
+                State->M[EA] = State->AC;
+                break;
+        case 002:
+                State->PC = EA;
+                break;
+        case 003:
+                State->IX = State->PC, State->PC = EA;
+                break;
+        case 004:
+                State->Halted = true;
+                break;
+        case 005:
+                State->IX -= EA;
+                break;
+        case 006:
+                State->AC = (State->AC & ((1 << 18) - 1)) +
+                            State->M[EA] + (State->AC >> 18);
+                break;
+        case 007:
+                State->AC = (State->AC & ((1 << 18) - 1)) -
+                            State->M[EA] - (State->AC >> 18);
+                break;
+        case 010:
+                State->AC = (State->AC & ((1 << 18) - 1)) & State->M[EA];
+                break;
+        case 011:
+                State->AC = (State->AC & ((1 << 18) - 1)) | State->M[EA];
+                break;
+        case 012:
+                State->AC = (State->AC & ((1 << 18) - 1)) ^ State->M[EA];
+                break;
+        case 013:
+                State->IX = State->M[EA];
+                break;
+        case 014:
+                State->M[EA] = State->IX;
+                break;
+        case 015:
+                State->AC = EA;
+                break;
+        case 016:
+                State->AC = State->IX;
+                break;
+        case 017:
+                State->IX = State->AC;
+                break;
         }
 }
