@@ -73,9 +73,11 @@ int main(int argc, char **argv)
                 while (!State->Halted)
                 {
                         AdvanceState(State);
-                        if (State->M[IO_PUTC])
+                        if (State->M[IO_PUTC] != 0)
                         {
                                 putchar(State->M[IO_PUTC] & 0xFF);
+                                fflush(stdout);
+                                State->M[IO_PUTC] = 0;
                         }
 
                         if (kbhit())
@@ -84,9 +86,6 @@ int main(int argc, char **argv)
                         }
                 }
 
-                printf("AC = %.8o\n", State->AC);
-                printf("IX = %.8o\n", State->IX);
-                printf("PC = %.8o\n", State->PC);
                 restore_terminal();
                 free(State);
         }

@@ -143,7 +143,7 @@ int asmmain(int argc, char *argv[])
                 uint32_t addr = (line_num - 1) * 2;
                 memory[addr] = instr & 0x3FFFF;
                 memory[addr + 1] = (instr >> 18) & 0x3FFFF;
-                printf("Line %d: %s %s -> %06o %06o\n",
+                printf("Line %d: %s %s -> %06x %06x\n",
                        line_num, mnemonic, operand,
                        memory[addr], memory[addr + 1]);
         }

@@ -1,4 +1,5 @@
-        LEA     16
-        STA     256
-        ADC     256
+        LEA     0x3FFF0
+        TXA
+        LEA     0x41
+        STA     IX,0x00
         HLT
