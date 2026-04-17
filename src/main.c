@@ -82,8 +82,6 @@ int main(int argc, char **argv)
                         {
                                 State->M[IO_GETC] = getch();
                         }
-
-                        State->Halted = true;
                 }
 
                 printf("AC = %.8o\n", State->AC);
