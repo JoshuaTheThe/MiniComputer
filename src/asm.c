@@ -73,7 +73,7 @@ int asmmain(int argc, char *argv[])
                 }
                 else if (operand[0])
                 {
-                        imm = strtol(operand, NULL, 8);
+                        imm = strtol(operand, NULL, 0);
                 }
 
                 char *cond_suffix = strchr(mnemonic, ',');
